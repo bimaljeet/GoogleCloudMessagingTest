@@ -1,0 +1,56 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+	       http://www.springframework.org/schema/beans
+	       http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <bean id="systemPropertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:conf/application.properties</value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders" value="true" />
+        <property name="ignoreResourceNotFound" value="true" />
+    </bean>
+
+    <bean id="vvmGcmXmppPacketListener"
+          name="vvmGcmXmppPacketListener"
+          class="com.gcm.GcmXmppPacketListener">
+        <property name="gcmXmppServer" ref="vvmGcmXmppServer" />
+    </bean>
+
+    <bean id="cpsGcmXmppPacketListener"
+          name="cpsGcmXmppPacketListener"
+          class="com.gcm.GcmXmppPacketListener">
+        <property name="gcmXmppServer" ref="cpsGcmXmppServer" />
+    </bean>
+
+    <bean id="gcmHttpServer"
+          name="gcmHttpServer" init-method="init"
+          class="com.gcm.GcmHttpServer">
+        <property name="serverKey" value="#{systemProperties['LUMBERJACK_GCM_SERVER_KEY'] ?: '${LUMBERJACK_GCM_SERVER_KEY}'}" />
+    </bean>
+
+    <bean id="vvmGcmXmppServer"
+          name="vvmGcmXmppServer" init-method="start"
+          class="com.gcm.DefaultLumberjackGcmServiceImpl">
+        <property name="gcmSenderId" value="#{systemProperties['LUMBERJACK_GCM_VVM_SENDER_ID'] ?: '${LUMBERJACK_GCM_VVM_SENDER_ID}'}" />
+        <property name="gcmApiKey" value="#{systemProperties['LUMBERJACK_GCM_VVM_API_KEY'] ?: '${LUMBERJACK_GCM_VVM_API_KEY}'}" />
+        <property name="gcmXmppPacketListener" ref="vvmGcmXmppPacketListener" />
+        <property name="collapseKey" value="#{systemProperties['LUMBERJACK_GCM_VVM_COLLAPSE_KEY'] ?: '${LUMBERJACK_GCM_VVM_COLLAPSE_KEY}'}" />
+        <property name="timeToLive" value="#{systemProperties['LUMBERJACK_GCM_TIME_TO_LIVE'] ?: '${LUMBERJACK_GCM_TIME_TO_LIVE}'}" />
+        <property name="delayWhileIdle" value="#{systemProperties['LUMBERJACK_GCM_DELAY_WHILE_IDLE'] ?: '${LUMBERJACK_GCM_DELAY_WHILE_IDLE}'}" />
+    </bean>
+
+    <bean id="cpsGcmXmppServer"
+          name="cpsGcmXmppServer" init-method="start"
+          class="com.gcm.DefaultLumberjackGcmServiceImpl">
+        <property name="gcmSenderId" value="#{systemProperties['LUMBERJACK_GCM_CPS_SENDER_ID'] ?: '${LUMBERJACK_GCM_CPS_SENDER_ID}'}" />
+        <property name="gcmApiKey" value="#{systemProperties['LUMBERJACK_GCM_CPS_API_KEY'] ?: '${LUMBERJACK_GCM_CPS_API_KEY}'}" />
+        <property name="gcmXmppPacketListener" ref="cpsGcmXmppPacketListener" />
+        <property name="collapseKey" value="#{systemProperties['LUMBERJACK_GCM_CPS_COLLAPSE_KEY'] ?: '${LUMBERJACK_GCM_CPS_COLLAPSE_KEY}'}" />
+        <property name="timeToLive" value="#{systemProperties['LUMBERJACK_GCM_TIME_TO_LIVE'] ?: '${LUMBERJACK_GCM_TIME_TO_LIVE}'}" />
+        <property name="delayWhileIdle" value="#{systemProperties['LUMBERJACK_GCM_DELAY_WHILE_IDLE'] ?: '${LUMBERJACK_GCM_DELAY_WHILE_IDLE}'}" />
+    </bean>
+</beans>
